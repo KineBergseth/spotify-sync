@@ -1,6 +1,6 @@
 """
 Spotify Bucket Master Playlist Sync
-Reads all sub-playlists per bucket, computes the union of tracks,
+Reads all sub-playlists per bucket, computes the union of items,
 and syncs each master playlist to match exactly.
 """
 
@@ -35,7 +35,7 @@ def headers(token: str) -> dict:
     return {"Authorization": f"Bearer {token}"}
 
 
-def get_playlist_tracks(token: str, playlist_id: str) -> set[str]:
+def get_playlist_items(token: str, playlist_id: str) -> set[str]:
     """Return set of track URIs in a playlist (handles pagination)."""
     uris = set()
     url = f"{BASE}/playlists/{playlist_id}/items"
@@ -58,8 +58,8 @@ def get_playlist_tracks(token: str, playlist_id: str) -> set[str]:
     return uris
 
 
-def add_tracks(token: str, playlist_id: str, uris: list[str]):
-    """Add tracks to a playlist in batches of 100."""
+def add_items(token: str, playlist_id: str, uris: list[str]):
+    """Add items to a playlist in batches of 100."""
     for i in range(0, len(uris), 100):
         batch = uris[i : i + 100]
         resp = requests.post(
@@ -76,17 +76,17 @@ def add_tracks(token: str, playlist_id: str, uris: list[str]):
                 json={"uris": batch},
             )
         resp.raise_for_status()
-        log.info(f"  Added {len(batch)} tracks")
+        log.info(f"  Added {len(batch)} items")
 
 
-def remove_tracks(token: str, playlist_id: str, uris: list[str]):
-    """Remove tracks from a playlist in batches of 100."""
+def remove_items(token: str, playlist_id: str, uris: list[str]):
+    """Remove items from a playlist in batches of 100."""
     for i in range(0, len(uris), 100):
         batch = uris[i : i + 100]
         resp = requests.delete(
             f"{BASE}/playlists/{playlist_id}/items",
             headers=headers(token),
-            json={"tracks": [{"uri": u} for u in batch]},
+            json={"items": [{"uri": u} for u in batch]},
         )
         if resp.status_code == 429:
             wait = int(resp.headers.get("Retry-After", 5))
@@ -94,10 +94,10 @@ def remove_tracks(token: str, playlist_id: str, uris: list[str]):
             resp = requests.delete(
                 f"{BASE}/playlists/{playlist_id}/items",
                 headers=headers(token),
-                json={"tracks": [{"uri": u} for u in batch]},
+                json={"items": [{"uri": u} for u in batch]},
             )
         resp.raise_for_status()
-        log.info(f"  Removed {len(batch)} tracks")
+        log.info(f"  Removed {len(batch)} items")
 
 
 def sync_bucket(token: str, bucket_name: str, bucket_config: dict):
@@ -116,42 +116,42 @@ def sync_bucket(token: str, bucket_name: str, bucket_config: dict):
         pl_id = source["id"]
         pl_name = source["name"]
         try:
-            tracks = get_playlist_tracks(token, pl_id)
-            log.info(f"  [{pl_name}]: {len(tracks)} tracks")
-            union |= tracks
+            items = get_playlist_items(token, pl_id)
+            log.info(f"  [{pl_name}]: {len(items)} items")
+            union |= items
         except Exception as e:
             log.error(f"  Failed to read [{pl_name}] ({pl_id}): {e}")
 
-    log.info(f"  Union total: {len(union)} unique tracks")
+    log.info(f"  Union total: {len(union)} unique items")
 
     if ABORT_IF_UNION_EMPTY and len(union) == 0:
         log.error(f"  ABORTED: union is empty for bucket {bucket_name}. Master not touched.")
         return
 
     try:
-        current = get_playlist_tracks(token, master_id)
+        current = get_playlist_items(token, master_id)
     except Exception as e:
         log.error(f"  Failed to read master {master_id}: {e}")
         return
 
-    log.info(f"  Master currently: {len(current)} tracks")
+    log.info(f"  Master currently: {len(current)} items")
 
     to_add = list(union - current)
     to_remove = list(current - union)
 
     if to_add:
-        log.info(f"  Adding {len(to_add)} tracks...")
-        add_tracks(token, master_id, to_add)
+        log.info(f"  Adding {len(to_add)} items...")
+        add_items(token, master_id, to_add)
     else:
         log.info("  Nothing to add")
 
     if to_remove:
-        log.info(f"  Removing {len(to_remove)} tracks...")
-        remove_tracks(token, master_id, to_remove)
+        log.info(f"  Removing {len(to_remove)} items...")
+        remove_items(token, master_id, to_remove)
     else:
         log.info("  Nothing to remove")
 
-    log.info(f"  Done. Master now has {len(union)} tracks.")
+    log.info(f"  Done. Master now has {len(union)} items.")
 
 
 def main():
