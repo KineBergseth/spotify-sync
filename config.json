@@ -1,0 +1,82 @@
+{
+  "buckets": {
+    "Void": {
+      "enabled": true,
+      "master": {"id": "5mwNgbXC3Top4ZN0SASGqn", "name": "Void"},
+      "sources": [
+        {"id": "6QM5pcE1MC9i2L0DEkC90w", "name": "Cinematic Reverie", "enabled": true},
+        {"id": "0pJfV3GZJIA6EbuSARCybi", "name": "Modern Reverie", "enabled": true},
+        {"id": "4txEaI4Zz0HLGcBX9xBWb2", "name": "Opus", "enabled": true},
+        {"id": "0J5cOdebvkMltZKVdOPW8D", "name": "Quiet Hours", "enabled": true},
+        {"id": "1z1r36EyIoEg2H67kEA5o4", "name": "Late Night Jazz", "enabled": true},
+        {"id": "5xzpQKqBPiFaSELgN8jj2Q", "name": "Lo-Fi", "enabled": true}
+      ]
+    },
+    "Orbit": {
+      "enabled": true,
+      "master": {"id": "7HFgHG5cg1ABldhRPDpAFv", "name": "Orbit"},
+      "sources": [
+        {"id": "15YA1E3Go7VCrMbJ4cj5FR", "name": "Easy Going", "enabled": true},
+        {"id": "0UUnBuLKnkI1MOum7JyjiT", "name": "Analog Era", "enabled": true},
+        {"id": "0wkZ1m4axKh8zjkYhbdSsU", "name": "Softcore Sadness", "enabled": true},
+        {"id": "26Ow3NYNkyrspEhRbmQqCE", "name": "Lost in Translation", "enabled": true},
+        {"id": "2XYa5oBqZGMUgb72vM04rp", "name": "City Haze", "enabled": true},
+        {"id": "0CRhiRlcq5ptMNd0Al2lY2", "name": "Old Gods", "enabled": true},
+        {"id": "6Xd21jsmTXf32b1b3SU1WD", "name": "Cinematic Surge", "enabled": true}
+      ]
+    },
+    "Atmosphere": {
+      "enabled": true,
+      "master": {"id": "7mu6JTKDNGCSq7VzwF03KT", "name": "Atmosphere"},
+      "sources": [
+        {"id": "2K0LrA73Pndlvz6te0KyXs", "name": "夜行", "enabled": true},
+        {"id": "4etKn0HytgPWvml1mO7E3y", "name": "Night Circulation", "enabled": true},
+        {"id": "4yX7D30kHawxktFHedw1qV", "name": "Norwegian Hits", "enabled": false},
+        {"id": "79MuEULach10SWjiKFR009", "name": "Emotional Archaeology", "enabled": false},
+        {"id": "4P8nU784jaiqZJ6wfZlFGN", "name": "Gatho", "enabled": false},
+        {"id": "4TxA3eJU50hNXqTOk9bUiY", "name": "Reggae & Latin", "enabled": false},
+        {"id": "6IUzWmNfpSFCdV5rDqVcGp", "name": "House Call", "enabled": false},
+        {"id": "1ANtukwres3xYbkWPsZPg9", "name": "Controlled Delivery", "enabled": false},
+        {"id": "2hJfeTRzneA4geaEYqhMWJ", "name": "Guilty Pleasures", "enabled": true},
+        {"id": "7JjLUxFRRyokvy0LBFhVE4", "name": "Widescreen", "enabled": false}
+      ]
+    },
+    "Velocity": {
+      "enabled": true,
+      "master": {"id": "5JLIar1xHfTl8s6rlUtH2c", "name": "Velocity"},
+      "sources": [
+        {"id": "3VUDr5L9U4x4GAwd8tMOiY", "name": "케이팝", "enabled": true},
+        {"id": "1jDo8rxjHgAADVaUwPrJj8", "name": "Spite Work", "enabled": true},
+        {"id": "0wIGy2ofzdsrdKp5LS7lBd", "name": "熱狂", "enabled": true},
+        {"id": "0AgpY4BjE3lCh8DxUditBc", "name": "Empire Electric", "enabled": false},
+        {"id": "27AY82wDN3iOxWXbD8shqM", "name": "Unsupervised at 3AM", "enabled": true},
+        {"id": "6LS4hAxTnXYRow4sC1qDfP", "name": "Classic Rock", "enabled": false},
+        {"id": "6Lvikn9yx70ycuSKm4CqfP", "name": "Disco & Funk", "enabled": false},
+        {"id": "7jkgmP7KNsZ7sIb8BiK2Dn", "name": "Rewind", "enabled": false}
+      ]
+    },
+    "Impact": {
+      "enabled": true,
+      "master": {"id": "22unSbFNQOrPdN19JVLIeG", "name": "Impact"},
+      "sources": [
+        {"id": "0l1i4tgChQX04JzitJCkqx", "name": "Overclocked", "enabled": true},
+        {"id": "6coq3KzxHCaDbea8nas9ZT", "name": "Full Send", "enabled": false},
+        {"id": "3nBOZ3Ytw8SeWBiGxGYf5k", "name": "Eurodance", "enabled": false},
+        {"id": "5ppi4XkgfyByYCv8pC2ZPw", "name": "Respectfully Unstable", "enabled": true},
+        {"id": "3nt3TQy9pOv1tAUoXvczce", "name": "Emotional Static", "enabled": true},
+        {"id": "0VUtiD5tOzlY15ySFlvE0s", "name": "Montagem", "enabled": false},
+        {"id": "5SeZTtrfacHkKfuGFxamAX", "name": "Montagem Demorado", "enabled": false}
+      ]
+    },
+    "Dark Matter": {
+      "enabled": false,
+      "master": {"id": "PLAYLIST_ID_DARK_MATTER_MASTER", "name": "Dark Matter"},
+      "sources": [
+        {"id": "4ZpVKzygPgazMjqvSO8bjY", "name": "Off The Map ", "enabled": true},
+        {"id": "4fvQ6f2f2eSBJ7487aMmvF", "name": "Pre-Industrial Bangers", "enabled": true},
+        {"id": "7HsmliJTG7EjWHLQI3hmGp", "name": "Elevator Core", "enabled": true},
+        {"id": "1rzMJEL2y6uUDWsOmXGjSr", "name": "Unhinged", "enabled": true}
+      ]
+    }
+  }
+}
