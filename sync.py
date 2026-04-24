@@ -9,14 +9,12 @@ import time
 import logging
 import os
 import requests
-from typing import Optional
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
-# ── Spotify API ────────────────────────────────────────────────────────────────
-
 BASE = "https://api.spotify.com/v1"
+ABORT_IF_UNION_EMPTY = True
 
 
 def refresh_access_token(client_id: str, client_secret: str, refresh_token: str) -> str:
@@ -40,23 +38,23 @@ def headers(token: str) -> dict:
 def get_playlist_tracks(token: str, playlist_id: str) -> set[str]:
     """Return set of track URIs in a playlist (handles pagination)."""
     uris = set()
-    url = f"{BASE}/playlists/{playlist_id}/tracks"
-    params = {"fields": "next,items(track(uri,type))", "limit": 100}
+    url = f"{BASE}/playlists/{playlist_id}/items"
+    params = {"limit": 100}
     while url:
         resp = requests.get(url, headers=headers(token), params=params)
         if resp.status_code == 429:
             wait = int(resp.headers.get("Retry-After", 5))
-            log.warning(f"Rate limited. Waiting {wait}s…")
+            log.warning(f"Rate limited. Waiting {wait}s...")
             time.sleep(wait)
             continue
         resp.raise_for_status()
         data = resp.json()
         for item in data.get("items", []):
-            track = item.get("track")
-            if track and track.get("type") == "track":
+            track = item.get("item") or item.get("track")
+            if track and isinstance(track, dict) and track.get("type") == "track":
                 uris.add(track["uri"])
         url = data.get("next")
-        params = {}  # next URL already includes params
+        params = {}
     return uris
 
 
@@ -65,7 +63,7 @@ def add_tracks(token: str, playlist_id: str, uris: list[str]):
     for i in range(0, len(uris), 100):
         batch = uris[i : i + 100]
         resp = requests.post(
-            f"{BASE}/playlists/{playlist_id}/tracks",
+            f"{BASE}/playlists/{playlist_id}/items",
             headers=headers(token),
             json={"uris": batch},
         )
@@ -73,7 +71,7 @@ def add_tracks(token: str, playlist_id: str, uris: list[str]):
             wait = int(resp.headers.get("Retry-After", 5))
             time.sleep(wait)
             resp = requests.post(
-                f"{BASE}/playlists/{playlist_id}/tracks",
+                f"{BASE}/playlists/{playlist_id}/items",
                 headers=headers(token),
                 json={"uris": batch},
             )
@@ -86,7 +84,7 @@ def remove_tracks(token: str, playlist_id: str, uris: list[str]):
     for i in range(0, len(uris), 100):
         batch = uris[i : i + 100]
         resp = requests.delete(
-            f"{BASE}/playlists/{playlist_id}/tracks",
+            f"{BASE}/playlists/{playlist_id}/items",
             headers=headers(token),
             json={"tracks": [{"uri": u} for u in batch]},
         )
@@ -94,7 +92,7 @@ def remove_tracks(token: str, playlist_id: str, uris: list[str]):
             wait = int(resp.headers.get("Retry-After", 5))
             time.sleep(wait)
             resp = requests.delete(
-                f"{BASE}/playlists/{playlist_id}/tracks",
+                f"{BASE}/playlists/{playlist_id}/items",
                 headers=headers(token),
                 json={"tracks": [{"uri": u} for u in batch]},
             )
@@ -102,17 +100,14 @@ def remove_tracks(token: str, playlist_id: str, uris: list[str]):
         log.info(f"  Removed {len(batch)} tracks")
 
 
-# ── Sync logic ─────────────────────────────────────────────────────────────────
-
 def sync_bucket(token: str, bucket_name: str, bucket_config: dict):
     master_id = bucket_config["master"]["id"]
     master_name = bucket_config["master"]["name"]
     sources = bucket_config["sources"]
 
     log.info(f"\n{'─'*50}")
-    log.info(f"Syncing bucket: {bucket_name} → master: {master_name}")
+    log.info(f"Syncing bucket: {bucket_name} -> master: {master_name}")
 
-    # Build union of all enabled source playlists
     union: set[str] = set()
     for source in sources:
         if not source.get("enabled", True):
@@ -129,7 +124,10 @@ def sync_bucket(token: str, bucket_name: str, bucket_config: dict):
 
     log.info(f"  Union total: {len(union)} unique tracks")
 
-    # Get current master state
+    if ABORT_IF_UNION_EMPTY and len(union) == 0:
+        log.error(f"  ABORTED: union is empty for bucket {bucket_name}. Master not touched.")
+        return
+
     try:
         current = get_playlist_tracks(token, master_id)
     except Exception as e:
@@ -142,13 +140,13 @@ def sync_bucket(token: str, bucket_name: str, bucket_config: dict):
     to_remove = list(current - union)
 
     if to_add:
-        log.info(f"  Adding {len(to_add)} tracks…")
+        log.info(f"  Adding {len(to_add)} tracks...")
         add_tracks(token, master_id, to_add)
     else:
         log.info("  Nothing to add")
 
     if to_remove:
-        log.info(f"  Removing {len(to_remove)} tracks…")
+        log.info(f"  Removing {len(to_remove)} tracks...")
         remove_tracks(token, master_id, to_remove)
     else:
         log.info("  Nothing to remove")
@@ -157,20 +155,18 @@ def sync_bucket(token: str, bucket_name: str, bucket_config: dict):
 
 
 def main():
-    # Load credentials from environment (set as GitHub secrets)
     client_id = os.environ["SPOTIFY_CLIENT_ID"]
     client_secret = os.environ["SPOTIFY_CLIENT_SECRET"]
     refresh_token = os.environ["SPOTIFY_REFRESH_TOKEN"]
 
-    # Load config
-    with open("config.json") as f:
+    with open("config.json", encoding="utf-8") as f:
         config = json.load(f)
 
-    # Get fresh access token
-    log.info("Getting access token…")
+    log.info("Getting access token...")
     token = refresh_access_token(client_id, client_secret, refresh_token)
 
-    # Sync each bucket
+    log.info(f"Authenticated as: {requests.get(BASE + '/me', headers=headers(token)).json().get('display_name')}")
+
     for bucket_name, bucket_config in config["buckets"].items():
         if not bucket_config.get("enabled", True):
             log.info(f"Skipping {bucket_name} (disabled)")
