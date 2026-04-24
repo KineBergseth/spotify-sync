@@ -61,8 +61,6 @@ Runs every night at 04:00 UTC (05:00 Oslo winter, 06:00 Oslo summer).
 
 **To disable an entire bucket:** set `"enabled": false` at the bucket level. The master won't be touched.
 
-**Widescreen** is set to `"enabled": false` by default — it is a parking lot playlist, not a finished list.
-
 ---
 
 ## Setup
