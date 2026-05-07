@@ -68,14 +68,21 @@
         {"id": "5SeZTtrfacHkKfuGFxamAX", "name": "Montagem Demorado", "enabled": false}
       ]
     },
-    "Dark Matter": {
-      "enabled": false,
-      "master": {"id": "PLAYLIST_ID_DARK_MATTER_MASTER", "name": "Dark Matter"},
+    "Vibes": {
+      "enabled": true,
+      "master": {"id": "69Ftk9HXYCKzNwTtcMgeqX", "name": "Vibes"},
       "sources": [
-        {"id": "4ZpVKzygPgazMjqvSO8bjY", "name": "Off The Map ", "enabled": true},
-        {"id": "4fvQ6f2f2eSBJ7487aMmvF", "name": "Pre-Industrial Bangers", "enabled": true},
-        {"id": "7HsmliJTG7EjWHLQI3hmGp", "name": "Elevator Core", "enabled": true},
-        {"id": "1rzMJEL2y6uUDWsOmXGjSr", "name": "Unhinged", "enabled": true}
+          {"id": "6IUzWmNfpSFCdV5rDqVcGp", "name": "House Call", "enabled": true},
+          {"id": "2hJfeTRzneA4geaEYqhMWJ", "name": "Guilty Pleasures", "enabled": true},
+          {"id": "7JjLUxFRRyokvy0LBFhVE4", "name": "Widescreen", "enabled": true},
+          {"id": "79MuEULach10SWjiKFR009", "name": "Emotional Archaeology", "enabled": true},
+          {"id": "1ANtukwres3xYbkWPsZPg9", "name": "Controlled Delivery", "enabled": true},
+          {"id": "6LS4hAxTnXYRow4sC1qDfP", "name": "Classic Rock", "enabled": true},
+          {"id": "6Lvikn9yx70ycuSKm4CqfP", "name": "Disco & Funk", "enabled": true},
+          {"id": "7jkgmP7KNsZ7sIb8BiK2Dn", "name": "Rewind", "enabled": true},
+          {"id": "1jDo8rxjHgAADVaUwPrJj8", "name": "Spite Work", "enabled": true},
+          {"id": "5ppi4XkgfyByYCv8pC2ZPw", "name": "Respectfully Unstable", "enabled": true},
+          {"id": "3nt3TQy9pOv1tAUoXvczce", "name": "Emotional Static", "enabled": true},
       ]
     }
   }
