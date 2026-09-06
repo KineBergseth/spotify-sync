@@ -1,18 +1,18 @@
-name: Spotify Bucket Sync
+name: Spotify Master Sync
 
 on:
   schedule:
-    # Runs every day at 04:00 UTC (05:00 Oslo winter, 06:00 Oslo summer)
-    # Adjust the UTC hour if needed: https://crontab.guru
-    - cron: "0 4 * * *"
-
-  # Also allows you to trigger it manually from the GitHub Actions tab
+    - cron: "0 4 * * *"      # 04:00 UTC nightly
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Validate and report without writing"
+        type: boolean
+        default: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
@@ -30,4 +30,9 @@ jobs:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
           SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
-        run: python sync.py
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python sync.py --dry-run
+          else
+            python sync.py
+          fi

@@ -4,15 +4,28 @@ Run this ONCE to get your Spotify refresh token.
 Usage:
   pip install requests
   python get_token.py
+
+Before running, set these environment variables
+(see your shell profile ~/.zshrc, ~/.bashrc, or PowerShell $PROFILE):
+  SPOTIFY_CLIENT_ID
+  SPOTIFY_CLIENT_SECRET
 """
 
+import os
 import re
+import sys
 import urllib.parse
 import requests
 
-# ── Fill these in ──────────────────────────────────────────────────────────────
-CLIENT_ID = "YOUR_CLIENT_ID_HERE"
-CLIENT_SECRET = "YOUR_CLIENT_SECRET_HERE"
+# ── Pulled from environment variables ──────────────────────────────────────────
+try:
+    CLIENT_ID = os.environ["SPOTIFY_CLIENT_ID"]
+    CLIENT_SECRET = os.environ["SPOTIFY_CLIENT_SECRET"]
+except KeyError as missing:
+    print(f"\nMissing environment variable: {missing}")
+    print("Set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET before running this script.")
+    sys.exit(1)
+
 REDIRECT_URI = "http://127.0.0.1:8888/callback"
 # ──────────────────────────────────────────────────────────────────────────────
 

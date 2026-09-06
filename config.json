@@ -1,82 +1,942 @@
 {
-  "buckets": {
-    "Void": {
+  "_comment": "v3. Subs declared once; masters reference them by name.",
+  "settings": {
+    "abort_if_union_empty": true,
+    "fail_on_duplicate_track": true,
+    "min_sub_size": 5,
+    "max_sub_size": 150
+  },
+  "inbox": {
+    "id": "2h0CpWZWmR5iFKFtWqghYe",
+    "name": "INBOX"
+  },
+  "subs": [
+    {
+      "name": "AMBIENT · Drift & New Age",
+      "id": "1Zlhtbi0ZgMGmwtRMiDA82",
       "enabled": true,
-      "master": {"id": "5mwNgbXC3Top4ZN0SASGqn", "name": "Void"},
-      "sources": [
-        {"id": "6QM5pcE1MC9i2L0DEkC90w", "name": "Cinematic Reverie", "enabled": true},
-        {"id": "0pJfV3GZJIA6EbuSARCybi", "name": "Modern Reverie", "enabled": true},
-        {"id": "4txEaI4Zz0HLGcBX9xBWb2", "name": "Opus", "enabled": true},
-        {"id": "0J5cOdebvkMltZKVdOPW8D", "name": "Quiet Hours", "enabled": true},
-        {"id": "1z1r36EyIoEg2H67kEA5o4", "name": "Late Night Jazz", "enabled": true},
-        {"id": "5xzpQKqBPiFaSELgN8jj2Q", "name": "Lo-Fi", "enabled": true}
+      "in_masters": [
+        "M · FOCUS & BAKGRUNN",
+        "M · SLOW & SOFT"
       ]
     },
-    "Orbit": {
+    {
+      "name": "ANIME · Openings & Endings",
+      "id": "0e1Cq10oiD1BMVDZ3dX1LV",
       "enabled": true,
-      "master": {"id": "7HFgHG5cg1ABldhRPDpAFv", "name": "Orbit"},
-      "sources": [
-        {"id": "15YA1E3Go7VCrMbJ4cj5FR", "name": "Easy Going", "enabled": true},
-        {"id": "0UUnBuLKnkI1MOum7JyjiT", "name": "Analog Era", "enabled": true},
-        {"id": "0wkZ1m4axKh8zjkYhbdSsU", "name": "Softcore Sadness", "enabled": true},
-        {"id": "26Ow3NYNkyrspEhRbmQqCE", "name": "Lost in Translation", "enabled": true},
-        {"id": "2XYa5oBqZGMUgb72vM04rp", "name": "City Haze", "enabled": true},
-        {"id": "0CRhiRlcq5ptMNd0Al2lY2", "name": "Old Gods", "enabled": true},
-        {"id": "6Xd21jsmTXf32b1b3SU1WD", "name": "Cinematic Surge", "enabled": true}
+      "in_masters": [
+        "M · ØSTASIA",
+        "M · ØSTASIA PARTY"
       ]
     },
-    "Atmosphere": {
+    {
+      "name": "ASIA · C-Pop",
+      "id": "58Fo3JqL4h5lsEazKhyKBP",
       "enabled": true,
-      "master": {"id": "7mu6JTKDNGCSq7VzwF03KT", "name": "Atmosphere"},
-      "sources": [
-        {"id": "2K0LrA73Pndlvz6te0KyXs", "name": "夜行", "enabled": true},
-        {"id": "4etKn0HytgPWvml1mO7E3y", "name": "Night Circulation", "enabled": true},
-        {"id": "4yX7D30kHawxktFHedw1qV", "name": "Norwegian Hits", "enabled": false},
-        {"id": "79MuEULach10SWjiKFR009", "name": "Emotional Archaeology", "enabled": false},
-        {"id": "4P8nU784jaiqZJ6wfZlFGN", "name": "Gatho", "enabled": false},
-        {"id": "4TxA3eJU50hNXqTOk9bUiY", "name": "Reggae & Latin", "enabled": false},
-        {"id": "6IUzWmNfpSFCdV5rDqVcGp", "name": "House Call", "enabled": false},
-        {"id": "1ANtukwres3xYbkWPsZPg9", "name": "Controlled Delivery", "enabled": false},
-        {"id": "2hJfeTRzneA4geaEYqhMWJ", "name": "Guilty Pleasures", "enabled": true},
-        {"id": "7JjLUxFRRyokvy0LBFhVE4", "name": "Widescreen", "enabled": false}
+      "in_masters": [
+        "M · ØSTASIA",
+        "M · ØSTASIA PARTY"
       ]
     },
-    "Velocity": {
+    {
+      "name": "ASIA · Thai & Southeast Asian",
+      "id": "46s23uEfuPkvwDNeDiZVos",
       "enabled": true,
-      "master": {"id": "5JLIar1xHfTl8s6rlUtH2c", "name": "Velocity"},
-      "sources": [
-        {"id": "3VUDr5L9U4x4GAwd8tMOiY", "name": "케이팝", "enabled": true},
-        {"id": "1jDo8rxjHgAADVaUwPrJj8", "name": "Spite Work", "enabled": true},
-        {"id": "0wIGy2ofzdsrdKp5LS7lBd", "name": "熱狂", "enabled": true},
-        {"id": "0AgpY4BjE3lCh8DxUditBc", "name": "Empire Electric", "enabled": false},
-        {"id": "27AY82wDN3iOxWXbD8shqM", "name": "Unsupervised at 3AM", "enabled": true},
-        {"id": "6LS4hAxTnXYRow4sC1qDfP", "name": "Classic Rock", "enabled": false},
-        {"id": "6Lvikn9yx70ycuSKm4CqfP", "name": "Disco & Funk", "enabled": false},
-        {"id": "7jkgmP7KNsZ7sIb8BiK2Dn", "name": "Rewind", "enabled": false}
+      "in_masters": [
+        "M · ØSTASIA",
+        "M · ØSTASIA PARTY"
       ]
     },
-    "Impact": {
+    {
+      "name": "CLASSICAL · Orchestral & Concerto",
+      "id": "2iAj5UldDyPljoNwgigKrG",
       "enabled": true,
-      "master": {"id": "22unSbFNQOrPdN19JVLIeG", "name": "Impact"},
-      "sources": [
-        {"id": "0l1i4tgChQX04JzitJCkqx", "name": "Overclocked", "enabled": true},
-        {"id": "6coq3KzxHCaDbea8nas9ZT", "name": "Full Send", "enabled": false},
-        {"id": "3nBOZ3Ytw8SeWBiGxGYf5k", "name": "Eurodance", "enabled": false},
-        {"id": "5ppi4XkgfyByYCv8pC2ZPw", "name": "Respectfully Unstable", "enabled": true},
-        {"id": "3nt3TQy9pOv1tAUoXvczce", "name": "Emotional Static", "enabled": true},
-        {"id": "0VUtiD5tOzlY15ySFlvE0s", "name": "Montagem", "enabled": false},
-        {"id": "5SeZTtrfacHkKfuGFxamAX", "name": "Montagem Demorado", "enabled": false}
+      "in_masters": [
+        "M · FOCUS & BAKGRUNN"
       ]
     },
-    "Dark Matter": {
-      "enabled": false,
-      "master": {"id": "PLAYLIST_ID_DARK_MATTER_MASTER", "name": "Dark Matter"},
-      "sources": [
-        {"id": "4ZpVKzygPgazMjqvSO8bjY", "name": "Off The Map ", "enabled": true},
-        {"id": "4fvQ6f2f2eSBJ7487aMmvF", "name": "Pre-Industrial Bangers", "enabled": true},
-        {"id": "7HsmliJTG7EjWHLQI3hmGp", "name": "Elevator Core", "enabled": true},
-        {"id": "1rzMJEL2y6uUDWsOmXGjSr", "name": "Unhinged", "enabled": true}
+    {
+      "name": "CLASSICAL · Piano & Solo",
+      "id": "02c6FjyD0KnUFt9V6PIBZp",
+      "enabled": true,
+      "in_masters": [
+        "M · FOCUS & BAKGRUNN",
+        "M · SLOW & SOFT"
+      ]
+    },
+    {
+      "name": "COUNTRY · Country & Americana",
+      "id": "2ztTzruRH7EjHfS4EOpUhT",
+      "enabled": true,
+      "in_masters": [
+        "M · SUMMER & DRIVE"
+      ]
+    },
+    {
+      "name": "EDM · Big Room & Mainstage",
+      "id": "5VlIQtN9ytGYc6d2oos9wA",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · VORS (mitt)",
+        "M · RAVE & HARD"
+      ]
+    },
+    {
+      "name": "EDM · Festival Pop & Mainstream",
+      "id": "0ZrXukX459XFIW7pf3cPkN",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · VORS (mitt)",
+        "M · SUMMER & DRIVE"
+      ]
+    },
+    {
+      "name": "EDM · Progressive & Melodic House",
+      "id": "13JIV4FGhFJn2dJdDjncUG",
+      "enabled": true,
+      "in_masters": [
+        "M · SUMMER & DRIVE"
+      ]
+    },
+    {
+      "name": "EDM · Slap House & Brazilian Bass",
+      "id": "3M5Vafri7viZF4Yir6Piki",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · VORS (mitt)"
+      ]
+    },
+    {
+      "name": "EDM · Tropical House & Sommer",
+      "id": "3y2nhrk2naLYFO3HfACDgl",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · SUMMER & DRIVE"
+      ]
+    },
+    {
+      "name": "Eurodance & Hands Up",
+      "id": "0cBMmzZf1PyVeYMHD91sM9",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · VORS (mitt)",
+        "M · RAVE & HARD"
+      ]
+    },
+    {
+      "name": "FOLK · Celtic & Traditional Folk",
+      "id": "5v2vFNGLB8o0mGgJJJVyl0",
+      "enabled": true,
+      "in_masters": [
+        "M · FOCUS & BAKGRUNN"
+      ]
+    },
+    {
+      "name": "FOLK · Nordic & Pagan Folk",
+      "id": "2jOGr8U9bcNcV9BCEaPb8N",
+      "enabled": true,
+      "in_masters": [
+        "M · FOCUS & BAKGRUNN"
+      ]
+    },
+    {
+      "name": "FOLK · Sea Shanties",
+      "id": "32J5eeIvdrLGWpkaUHcbXl",
+      "enabled": true,
+      "in_masters": [
+        "M · SHITPOST & KOS"
+      ]
+    },
+    {
+      "name": "FOLK · Singer-Songwriter & Indie Folk",
+      "id": "6qBfRy4jnXKlgeMb4E5goH",
+      "enabled": true,
+      "in_masters": [
+        "M · SLOW & SOFT"
+      ]
+    },
+    {
+      "name": "FUNK · Funk & Disco",
+      "id": "1VYZuSnpGgeLSDg9uetjB3",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · BAKGRUNN (trygg)",
+        "M · SUMMER & DRIVE",
+        "M · RETRO & OLDIES"
+      ]
+    },
+    {
+      "name": "HARD · Dubstep & Bass",
+      "id": "2CYrwfI7JDy1tiPknB5OuF",
+      "enabled": true,
+      "in_masters": [
+        "M · RAVE & HARD"
+      ]
+    },
+    {
+      "name": "HARD · Hardstyle & Hard Dance",
+      "id": "0AqOieX41XIN1LiyN7u7KU",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (mitt)",
+        "M · RAVE & HARD"
+      ]
+    },
+    {
+      "name": "HARD · Hypertechno & Rave",
+      "id": "5J4rlUjhuFfbK62kf0zosb",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (mitt)",
+        "M · RAVE & HARD"
+      ]
+    },
+    {
+      "name": "HH · Hip Hop Core",
+      "id": "6DLbqrgrqkscHGmMwfSz0e",
+      "enabled": true,
+      "in_masters": [
+        "M · HIP HOP"
+      ]
+    },
+    {
+      "name": "HH · Old School & Golden Era",
+      "id": "0wvelJQROv995aeTd1v16D",
+      "enabled": true,
+      "in_masters": [
+        "M · RETRO & OLDIES",
+        "M · HIP HOP"
+      ]
+    },
+    {
+      "name": "HH · Rap Rock & Rap Metal",
+      "id": "3DV5qVvFeTOvCQ8LSas1YS",
+      "enabled": true,
+      "in_masters": [
+        "M · ROCK & HEAVY",
+        "M · HIP HOP"
+      ]
+    },
+    {
+      "name": "HH · Trap & Modern Rap",
+      "id": "4esCvTNyrUEtvc1KCJBKml",
+      "enabled": true,
+      "in_masters": [
+        "M · HIP HOP"
+      ]
+    },
+    {
+      "name": "JP · J-Pop",
+      "id": "6K7H8J25ApVgzACvGpNMQQ",
+      "enabled": true,
+      "in_masters": [
+        "M · ØSTASIA",
+        "M · ØSTASIA PARTY"
+      ]
+    },
+    {
+      "name": "JP · J-Rock & Band",
+      "id": "068l94pTcbt95QRrKm2mqR",
+      "enabled": true,
+      "in_masters": [
+        "M · ROCK & HEAVY",
+        "M · ØSTASIA"
+      ]
+    },
+    {
+      "name": "JP · Vocaloid & Utaite",
+      "id": "5cldYzeqKOUXnJ9uoJGTWj",
+      "enabled": true,
+      "in_masters": [
+        "M · ØSTASIA",
+        "M · ØSTASIA PARTY"
+      ]
+    },
+    {
+      "name": "KIDS · Barnesanger",
+      "id": "0c3Qsr48iXh88O7DCXiNgc",
+      "enabled": true,
+      "in_masters": [
+        "M · SHITPOST & KOS"
+      ]
+    },
+    {
+      "name": "KR · 2nd/3rd Gen Classics",
+      "id": "7IODKoOraBoQ808S4ZhblJ",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (mitt)",
+        "M · ØSTASIA",
+        "M · ØSTASIA PARTY"
+      ]
+    },
+    {
+      "name": "KR · K-Ballad & OST",
+      "id": "5dX6hDSlCad98oap7jc5J0",
+      "enabled": true,
+      "in_masters": [
+        "M · ØSTASIA",
+        "M · SLOW & SOFT"
+      ]
+    },
+    {
+      "name": "KR · K-Hip Hop & R&B",
+      "id": "1ch4AZxGIIBzoG95xacaUI",
+      "enabled": true,
+      "in_masters": [
+        "M · HIP HOP",
+        "M · ØSTASIA"
+      ]
+    },
+    {
+      "name": "KR · K-Rock & Band",
+      "id": "2QPHhDCCJDJfbt2TlZpb04",
+      "enabled": true,
+      "in_masters": [
+        "M · ROCK & HEAVY",
+        "M · ØSTASIA"
+      ]
+    },
+    {
+      "name": "KR · Modern K-Pop",
+      "id": "09MWFgjHVpma3cj1CkSIFN",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (mitt)",
+        "M · ØSTASIA",
+        "M · ØSTASIA PARTY"
+      ]
+    },
+    {
+      "name": "KR · Trot",
+      "id": "0hxME1ZtNIRAsvP3CO8xa4",
+      "enabled": true,
+      "in_masters": [
+        "M · ØSTASIA"
+      ]
+    },
+    {
+      "name": "LATIN · Reggaeton & Urbano",
+      "id": "2tRyfr7B6SVts8GB7PRXuS",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · VORS (mitt)"
+      ]
+    },
+    {
+      "name": "LATIN · Tropical & Classics",
+      "id": "79hHghX8pRI77N6oZEn9gA",
+      "enabled": true,
+      "in_masters": [
+        "M · BAKGRUNN (trygg)",
+        "M · SUMMER & DRIVE"
+      ]
+    },
+    {
+      "name": "MEME · Comedy & Novelty",
+      "id": "16GHTxP2sfSWaQjlbSlsbD",
+      "enabled": true,
+      "in_masters": [
+        "M · SHITPOST & KOS"
+      ]
+    },
+    {
+      "name": "METAL · Heavy & Thrash",
+      "id": "4kAkJASoXXwfodsAWifCvM",
+      "enabled": true,
+      "in_masters": [
+        "M · ROCK & HEAVY"
+      ]
+    },
+    {
+      "name": "MUSICAL · Stage & Screen",
+      "id": "5Kx3nQA4EkBAfzeeqwnYdt",
+      "enabled": true,
+      "in_masters": []
+    },
+    {
+      "name": "NO · Epadunk & Traktor",
+      "id": "7unqFAXasQlnwrH8UPYWZv",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (mitt)",
+        "M · NORSK & NORDISK",
+        "M · SHITPOST & KOS"
+      ]
+    },
+    {
+      "name": "NO · Norsk Hip Hop",
+      "id": "24USEYjBJVx3VS6jfhyl8j",
+      "enabled": true,
+      "in_masters": [
+        "M · HIP HOP",
+        "M · NORSK & NORDISK"
+      ]
+    },
+    {
+      "name": "NO · Norsk Pop",
+      "id": "5GWiqxK5tYdPBckW4IUWMi",
+      "enabled": true,
+      "in_masters": [
+        "M · NORSK & NORDISK"
+      ]
+    },
+    {
+      "name": "NO · Norsk Rock",
+      "id": "6eGNbc9Xq4jjVxFtMLsbTr",
+      "enabled": true,
+      "in_masters": [
+        "M · ROCK & HEAVY",
+        "M · NORSK & NORDISK"
+      ]
+    },
+    {
+      "name": "NO · Russelåt",
+      "id": "5pK6Aqu0a7o1FiWkdceNHK",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (mitt)",
+        "M · NORSK & NORDISK"
+      ]
+    },
+    {
+      "name": "PHONK · Montagem",
+      "id": "0VUtiD5tOzlY15ySFlvE0s",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (mitt)",
+        "M · RAVE & HARD"
+      ]
+    },
+    {
+      "name": "PHONK · Slow Brazilian & Funk",
+      "id": "35qVCKgfGkjvywFcWUEJwZ",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (mitt)",
+        "M · RAVE & HARD"
+      ]
+    },
+    {
+      "name": "POP · 00s Throwback",
+      "id": "3wdoGphVlJ3qxqUFonN8p4",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · POP GJENNOM TIÅRENE"
+      ]
+    },
+    {
+      "name": "POP · 2010-2014",
+      "id": "3SZEGTGrrTgEBTF75l6Ga8",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · POP GJENNOM TIÅRENE"
+      ]
+    },
+    {
+      "name": "POP · 2015-2019",
+      "id": "4TAcS9rGPHeby8pOVCcVaN",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · POP GJENNOM TIÅRENE"
+      ]
+    },
+    {
+      "name": "POP · 90s",
+      "id": "6qee6OSKU2k4gtR8d3kt5x",
+      "enabled": true,
+      "in_masters": [
+        "M · POP GJENNOM TIÅRENE",
+        "M · RETRO & OLDIES"
+      ]
+    },
+    {
+      "name": "POP · Ballads & Soft",
+      "id": "3cFPuHWkSF72f6MtIp5kxd",
+      "enabled": true,
+      "in_masters": [
+        "M · POP GJENNOM TIÅRENE",
+        "M · SLOW & SOFT"
+      ]
+    },
+    {
+      "name": "POP · Current 2020s",
+      "id": "65bYg72JrsOt2VP4RwBF8i",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · POP GJENNOM TIÅRENE"
+      ]
+    },
+    {
+      "name": "POP · Retro Gold (60s-80s)",
+      "id": "2zCOTssDQYroQutjDCfsu9",
+      "enabled": true,
+      "in_masters": [
+        "M · POP GJENNOM TIÅRENE",
+        "M · RETRO & OLDIES"
+      ]
+    },
+    {
+      "name": "POP · Yacht Rock & Soft Gold",
+      "id": "29Sz0M0bYjfZu1rJUhD2nP",
+      "enabled": true,
+      "in_masters": [
+        "M · BAKGRUNN (trygg)",
+        "M · POP GJENNOM TIÅRENE",
+        "M · SUMMER & DRIVE",
+        "M · RETRO & OLDIES",
+        "M · SLOW & SOFT"
+      ]
+    },
+    {
+      "name": "Punjabi/Indian pop",
+      "id": "20TiJTzZn0QVYl0ijuQB82",
+      "enabled": true,
+      "in_masters": []
+    },
+    {
+      "name": "REGGAE · Reggae & Dancehall",
+      "id": "2K57aUK1TUfYHwnKPKrtkH",
+      "enabled": true,
+      "in_masters": [
+        "M · BAKGRUNN (trygg)",
+        "M · SUMMER & DRIVE"
+      ]
+    },
+    {
+      "name": "RETRO · Doo-wop & Rock'n'Roll",
+      "id": "4KTjTJRGToBkJGz2FOwUHD",
+      "enabled": true,
+      "in_masters": [
+        "M · BAKGRUNN (trygg)",
+        "M · RETRO & OLDIES",
+        "M · VINTAGE SWING & JAZZ"
+      ]
+    },
+    {
+      "name": "ROCK · Classic Rock & Glam",
+      "id": "6m8x32GQykgUAsMBzU0b5b",
+      "enabled": true,
+      "in_masters": [
+        "M · RETRO & OLDIES",
+        "M · ROCK & HEAVY"
+      ]
+    },
+    {
+      "name": "ROCK · Emo & Alt 2000s",
+      "id": "5D4neDU9JXlx6iZpJyraoM",
+      "enabled": true,
+      "in_masters": [
+        "M · ROCK & HEAVY"
+      ]
+    },
+    {
+      "name": "ROCK · Indie & Alternative",
+      "id": "3h7ws7FiAYuFtS6jXFMaeP",
+      "enabled": true,
+      "in_masters": [
+        "M · ROCK & HEAVY"
+      ]
+    },
+    {
+      "name": "ROCK · Pop Punk & Skate",
+      "id": "6Ju6DY6OLOmOcoDqRJ7qHO",
+      "enabled": true,
+      "in_masters": [
+        "M · ROCK & HEAVY"
+      ]
+    },
+    {
+      "name": "ROCK · Stadium & Anthemic Pop-Rock",
+      "id": "4yMI0vNDzYSypiQat6NUnD",
+      "enabled": true,
+      "in_masters": [
+        "M · VORS (trygg)",
+        "M · POP GJENNOM TIÅRENE",
+        "M · SUMMER & DRIVE",
+        "M · ROCK & HEAVY"
+      ]
+    },
+    {
+      "name": "SCAN · Dansband, Schlager & Danskepop",
+      "id": "3Xz0sThj2ut2OFQ72LAwcd",
+      "enabled": true,
+      "in_masters": [
+        "M · NORSK & NORDISK"
+      ]
+    },
+    {
+      "name": "SCAN · Svensk & Dansk Pop",
+      "id": "5qmc21NzLmlTnHC9dt8FNU",
+      "enabled": true,
+      "in_masters": [
+        "M · NORSK & NORDISK"
+      ]
+    },
+    {
+      "name": "SCORE · Film, TV & Games",
+      "id": "3dYOhfk0yU5KSpkTQjx2vZ",
+      "enabled": true,
+      "in_masters": [
+        "M · FOCUS & BAKGRUNN"
+      ]
+    },
+    {
+      "name": "SOUL · Modern R&B & Neo Soul",
+      "id": "2dtEyeF48zpn8qrwykC7RQ",
+      "enabled": true,
+      "in_masters": [
+        "M · BAKGRUNN (trygg)"
+      ]
+    },
+    {
+      "name": "SOUL · Motown & Classic Soul",
+      "id": "6EoEUjPvh0MiSFgH8jNvNP",
+      "enabled": true,
+      "in_masters": [
+        "M · BAKGRUNN (trygg)",
+        "M · RETRO & OLDIES",
+        "M · VINTAGE SWING & JAZZ"
+      ]
+    },
+    {
+      "name": "SWING · Big Band & Classic Swing",
+      "id": "2kwpRiPLULIi9fsgWmBrv9",
+      "enabled": true,
+      "in_masters": [
+        "M · BAKGRUNN (trygg)",
+        "M · RETRO & OLDIES",
+        "M · VINTAGE SWING & JAZZ"
+      ]
+    },
+    {
+      "name": "SWING · Electro Swing",
+      "id": "2e1yQ0pbwD02O2l8BbWNks",
+      "enabled": true,
+      "in_masters": [
+        "M · BAKGRUNN (trygg)",
+        "M · VINTAGE SWING & JAZZ"
       ]
     }
-  }
+  ],
+  "masters": [
+    {
+      "name": "M · VORS (trygg)",
+      "id": "6LdOV55U3y2t4GsHRYRq9S",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "EDM · Big Room & Mainstage",
+        "EDM · Festival Pop & Mainstream",
+        "EDM · Slap House & Brazilian Bass",
+        "EDM · Tropical House & Sommer",
+        "Eurodance & Hands Up",
+        "FUNK · Funk & Disco",
+        "LATIN · Reggaeton & Urbano",
+        "POP · 00s Throwback",
+        "POP · 2010-2014",
+        "POP · 2015-2019",
+        "POP · Current 2020s",
+        "ROCK · Stadium & Anthemic Pop-Rock"
+      ],
+      "_note": "Crowd-safe party. No Korean, russelåt, phonk or novelty.",
+      "_audience": "trygg"
+    },
+    {
+      "name": "M · VORS (mitt)",
+      "id": "5HTlHwT0YapH2bZOmIO057",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "EDM · Big Room & Mainstage",
+        "EDM · Festival Pop & Mainstream",
+        "EDM · Slap House & Brazilian Bass",
+        "Eurodance & Hands Up",
+        "HARD · Hardstyle & Hard Dance",
+        "HARD · Hypertechno & Rave",
+        "KR · 2nd/3rd Gen Classics",
+        "KR · Modern K-Pop",
+        "LATIN · Reggaeton & Urbano",
+        "NO · Epadunk & Traktor",
+        "NO · Russelåt",
+        "PHONK · Montagem",
+        "PHONK · Slow Brazilian & Funk"
+      ],
+      "_note": "My party list. Everything, including what I have to explain."
+    },
+    {
+      "name": "M · BAKGRUNN (trygg)",
+      "id": "71hFC0QSmcnfALmqUKFTzA",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "FUNK · Funk & Disco",
+        "LATIN · Tropical & Classics",
+        "POP · Yacht Rock & Soft Gold",
+        "REGGAE · Reggae & Dancehall",
+        "RETRO · Doo-wop & Rock'n'Roll",
+        "SOUL · Modern R&B & Neo Soul",
+        "SOUL · Motown & Classic Soul",
+        "SWING · Big Band & Classic Swing",
+        "SWING · Electro Swing"
+      ],
+      "_note": "Crowd-safe background: soul, disco, swing, latin, reggae.",
+      "_audience": "trygg"
+    },
+    {
+      "name": "M · POP GJENNOM TIÅRENE",
+      "id": "0szBDLZEtihznOyboNcyBw",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "POP · Retro Gold (60s-80s)",
+        "POP · 90s",
+        "POP · 00s Throwback",
+        "POP · 2010-2014",
+        "POP · 2015-2019",
+        "POP · Current 2020s",
+        "POP · Ballads & Soft",
+        "POP · Yacht Rock & Soft Gold",
+        "ROCK · Stadium & Anthemic Pop-Rock"
+      ],
+      "_audience": "trygg",
+      "_note": "Broad Western pop timeline. Genre/era master, not an energy filter."
+    },
+    {
+      "name": "M · SUMMER & DRIVE",
+      "id": "0rX7BCTO1qDfivmDqMwaJ8",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "COUNTRY · Country & Americana",
+        "EDM · Festival Pop & Mainstream",
+        "EDM · Progressive & Melodic House",
+        "EDM · Tropical House & Sommer",
+        "FUNK · Funk & Disco",
+        "LATIN · Tropical & Classics",
+        "POP · Yacht Rock & Soft Gold",
+        "REGGAE · Reggae & Dancehall",
+        "ROCK · Stadium & Anthemic Pop-Rock"
+      ],
+      "_audience": "trygg",
+      "_note": "Warm, melodic and road-trip-friendly styles; avoids whole generic pop-era buckets."
+    },
+    {
+      "name": "M · RETRO & OLDIES",
+      "id": "23t1J88e14oLsCJBwhpALm",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "FUNK · Funk & Disco",
+        "HH · Old School & Golden Era",
+        "POP · 90s",
+        "POP · Retro Gold (60s-80s)",
+        "POP · Yacht Rock & Soft Gold",
+        "RETRO · Doo-wop & Rock'n'Roll",
+        "ROCK · Classic Rock & Glam",
+        "SOUL · Motown & Classic Soul",
+        "SWING · Big Band & Classic Swing"
+      ],
+      "_audience": "trygg",
+      "_note": "Oldies across pop, rock, soul, swing, funk and early hip-hop."
+    },
+    {
+      "name": "M · ROCK & HEAVY",
+      "id": "2jY0mQyqy140u0FLgsTNJb",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "HH · Rap Rock & Rap Metal",
+        "JP · J-Rock & Band",
+        "KR · K-Rock & Band",
+        "METAL · Heavy & Thrash",
+        "NO · Norsk Rock",
+        "ROCK · Classic Rock & Glam",
+        "ROCK · Emo & Alt 2000s",
+        "ROCK · Indie & Alternative",
+        "ROCK · Pop Punk & Skate",
+        "ROCK · Stadium & Anthemic Pop-Rock"
+      ],
+      "_note": "Rock and metal across regions, plus rap-rock/rap-metal."
+    },
+    {
+      "name": "M · HIP HOP",
+      "id": "0TFxJaVD0Obo4GspMFLp0V",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "HH · Hip Hop Core",
+        "HH · Old School & Golden Era",
+        "HH · Rap Rock & Rap Metal",
+        "HH · Trap & Modern Rap",
+        "KR · K-Hip Hop & R&B",
+        "NO · Norsk Hip Hop"
+      ],
+      "_note": "Hip-hop across regions. Standalone R&B/soul stays outside this master."
+    },
+    {
+      "name": "M · ØSTASIA",
+      "id": "3kA365lrFTpiSOIkLOuQzM",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "ANIME · Openings & Endings",
+        "ASIA · C-Pop",
+        "ASIA · Thai & Southeast Asian",
+        "JP · J-Pop",
+        "JP · J-Rock & Band",
+        "JP · Vocaloid & Utaite",
+        "KR · 2nd/3rd Gen Classics",
+        "KR · K-Ballad & OST",
+        "KR · K-Hip Hop & R&B",
+        "KR · K-Rock & Band",
+        "KR · Modern K-Pop",
+        "KR · Trot"
+      ],
+      "_note": "All current East-Asian scene subs, regardless of energy."
+    },
+    {
+      "name": "M · ØSTASIA PARTY",
+      "id": "2dEheJIJkIInO6s18tbSEB",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "ANIME · Openings & Endings",
+        "ASIA · C-Pop",
+        "ASIA · Thai & Southeast Asian",
+        "JP · J-Pop",
+        "JP · Vocaloid & Utaite",
+        "KR · 2nd/3rd Gen Classics",
+        "KR · Modern K-Pop"
+      ],
+      "_note": "Pop-forward East Asia party pool; intentionally broad while subs are still being refined."
+    },
+    {
+      "name": "M · NORSK & NORDISK",
+      "id": "2frJtcVGFQielKSjIWrfNP",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "NO · Epadunk & Traktor",
+        "NO · Norsk Hip Hop",
+        "NO · Norsk Pop",
+        "NO · Norsk Rock",
+        "NO · Russelåt",
+        "SCAN · Dansband, Schlager & Danskepop",
+        "SCAN · Svensk & Dansk Pop"
+      ]
+    },
+    {
+      "name": "M · RAVE & HARD",
+      "id": "0gLkQogCHpOBb22M3QNHRb",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "EDM · Big Room & Mainstage",
+        "Eurodance & Hands Up",
+        "HARD · Dubstep & Bass",
+        "HARD · Hardstyle & Hard Dance",
+        "HARD · Hypertechno & Rave",
+        "PHONK · Montagem",
+        "PHONK · Slow Brazilian & Funk"
+      ],
+      "_note": "High-energy electronic: big room, hands-up, bass, hard dance, rave and phonk."
+    },
+    {
+      "name": "M · FOCUS & BAKGRUNN",
+      "id": "7AXtkrcejpZJnU8R5omTw5",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "AMBIENT · Drift & New Age",
+        "CLASSICAL · Orchestral & Concerto",
+        "CLASSICAL · Piano & Solo",
+        "FOLK · Celtic & Traditional Folk",
+        "FOLK · Nordic & Pagan Folk",
+        "SCORE · Film, TV & Games"
+      ],
+      "_note": "Atmospheric/instrumental-leaning material for concentration and unobtrusive listening."
+    },
+    {
+      "name": "M · SLOW & SOFT",
+      "id": "5DLoX2KGzGE2pmHvtWduzZ",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "AMBIENT · Drift & New Age",
+        "CLASSICAL · Piano & Solo",
+        "FOLK · Singer-Songwriter & Indie Folk",
+        "KR · K-Ballad & OST",
+        "POP · Ballads & Soft",
+        "POP · Yacht Rock & Soft Gold"
+      ],
+      "_note": "Style-based soft pool; the auto calm master handles energy more precisely."
+    },
+    {
+      "name": "M · VINTAGE SWING & JAZZ",
+      "id": "39AGGMUcuthldeN4ctBADc",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "RETRO · Doo-wop & Rock'n'Roll",
+        "SOUL · Motown & Classic Soul",
+        "SWING · Big Band & Classic Swing",
+        "SWING · Electro Swing"
+      ],
+      "_audience": "trygg"
+    },
+    {
+      "name": "M · SHITPOST & KOS",
+      "id": "345R7MWgHe5xcj6A0qT9Zq",
+      "enabled": true,
+      "type": "union",
+      "include": [
+        "FOLK · Sea Shanties",
+        "KIDS · Barnesanger",
+        "MEME · Comedy & Novelty",
+        "NO · Epadunk & Traktor"
+      ],
+      "_note": "Comedy, kids, singalong and unserious comfort-listening."
+    },
+    {
+      "name": "M · PEAK (auto)",
+      "id": "73bxEhXJVYE4xJ1pDNaov4",
+      "enabled": true,
+      "type": "rule",
+      "rule": {
+        "energy_min": 0.91
+      }
+    },
+    {
+      "name": "M · SPRINT 160+ (auto)",
+      "id": "08I85Ttfo9uxiBDWZj10EB",
+      "enabled": true,
+      "type": "rule",
+      "rule": {
+        "tempo_min": 158,
+        "energy_min": 0.8
+      }
+    },
+    {
+      "name": "M · CALM & CONTENT (auto)",
+      "id": "5tA6ha5FzHTbeHox1r2qVM",
+      "enabled": true,
+      "type": "rule",
+      "rule": {
+        "energy_max": 0.45,
+        "valence_min": 0.5
+      }
+    }
+  ]
 }
