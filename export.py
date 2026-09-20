@@ -77,8 +77,10 @@ Emit two kinds of rows:
    - current_playlist: copy the playlist name exactly as shown below.
    - track_uri: copy the Spotify URI exactly as shown below.
    - artist / track: copy exactly enough to identify the song.
-   - suggested_playlist: advisory only. Use an exact playlist name visible in
-     this file if there is a clearly better destination; otherwise use UNSORTED.
+   - suggested_playlist: advisory only. Use an exact name from the "All valid
+     sub-playlist names" list below if there is a clearly better destination —
+     it does not need to be one of the playlists with full track listings in
+     this chunk. Otherwise use UNSORTED.
    - confidence: high or medium only. If confidence would be low, DO NOT FLAG.
    - reason: short factual reason (wrong genre, language, era, format, etc.).
 
@@ -211,12 +213,18 @@ def fetch(sp: Spotify, playlist_id: str) -> list[dict]:
     return out
 
 
-def write_chunk(path: str, groups: list[tuple[str, list[dict]]], index: int, total: int) -> None:
+def write_chunk(path: str, groups: list[tuple[str, list[dict]]], index: int, total: int,
+                 all_names: list[str]) -> None:
     with open(path, "w", encoding="utf-8") as f:
         f.write(PROMPT)
         f.write(
             f"\nPreferred output filename: `review_flags_{index:02d}.csv`\n"
             f"This is file {index} of {total}. It contains {len(groups)} complete playlists.\n\n"
+            "Each review file is reviewed in its own separate conversation, so this list is\n"
+            "the only way to know what other sub-playlists exist. A track can belong in any\n"
+            "of these even though only this chunk's playlists are shown in full below:\n\n"
+            f"All valid sub-playlist names ({len(all_names)}): "
+            + ", ".join(all_names) + "\n"
         )
         for name, tracks in groups:
             f.write(f"\n## {name}  ({len(tracks)} tracks)\n\n")
@@ -554,9 +562,11 @@ def run(args) -> None:
     if cur:
         chunks.append(cur)
 
+    all_sub_names = sorted(p["name"] for p in source_specs)
+
     for i, chunk in enumerate(chunks, 1):
         path = os.path.join(args.out, f"review_{i:02d}.md")
-        write_chunk(path, chunk, i, len(chunks))
+        write_chunk(path, chunk, i, len(chunks), all_sub_names)
         log.info("  wrote %s — %d playlists, %d tracks",
                  path, len(chunk), sum(len(t) for _, t in chunk))
 

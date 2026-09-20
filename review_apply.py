@@ -319,7 +319,8 @@ def main() -> None:
     log.info("")
     log.info("Moved %d flagged track(s) out of source subs into the holding playlist.", removed)
     log.info("Run python sync.py to rebuild masters without these tracks.")
-    log.info("Process the holding playlist later: move a track to INBOX for suggest.py, or file it manually.")
+    log.info("Process the holding playlist later: move a track to INBOX for the next "
+             "AI filing pass (inbox_export.py --prompt), or file it manually.")
 
 
 if __name__ == "__main__":

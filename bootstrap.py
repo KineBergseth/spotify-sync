@@ -77,7 +77,6 @@ MASTER_DESCRIPTIONS = {
     "M · POP GJENNOM TIÅRENE": "The Anglo-pop spine, 1960s to now. Synced. Do not edit by hand.",
     "M · PARTY & PREGAME": "Vors and singalong. Synced. Do not edit by hand.",
     "M · SUMMER & DRIVE": "Warm, forward motion. Synced. Do not edit by hand.",
-    "M · ØSTASIA (Asia Pop)": "Korea, Japan, and the rest of Asia. Synced. Do not edit by hand.",
     "M · ROCK & HEAVY": "Guitars, all languages. Synced. Do not edit by hand.",
     "M · NORSK & NORDISK": "Norwegian first, Scandi neighbours after. Synced. Do not edit by hand.",
     "M · RETRO & OLDIES": "Mostly pre-1995. Synced. Do not edit by hand.",
@@ -157,9 +156,14 @@ def load_ids() -> dict[str, str]:
 
 
 def save_json(path: str, data) -> None:
-    with open(path, "w", encoding="utf-8") as f:
+    """Write via a temp file + os.replace so an interrupted run (this writes
+    config.json, features.json, and playlist_ids.json) can't leave a file
+    half-written on disk."""
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
         f.write("\n")
+    os.replace(tmp, path)
 
 
 def ensure_playlist(sp: Spotify, ids: dict, existing: dict, name: str, desc: str) -> str:

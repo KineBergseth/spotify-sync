@@ -51,9 +51,13 @@ def load_config(path: str = CONFIG_PATH) -> dict:
 
 
 def save_json(path: str, data) -> None:
-    with open(path, "w", encoding="utf-8") as f:
+    """Write via a temp file + os.replace so a killed process can never leave
+    descriptions.json (or any other file this touches) truncated/corrupt."""
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=1)
         f.write("\n")
+    os.replace(tmp, path)
 
 
 def load_json(path: str, default=None):

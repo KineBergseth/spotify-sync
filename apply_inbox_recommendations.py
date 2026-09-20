@@ -1,20 +1,25 @@
-#!/usr/bin/env python3
 """
 Apply Spotify inbox placement recommendations safely.
 
-Reads spotify_inbox_placement_recommendations.csv and:
-  1. Processes only rows where action == MOVE.
-  2. Leaves KEEP_INBOX rows untouched.
-  3. Processes only tracks that are still in the live INBOX.
-  4. Adds each track to its recommended destination playlist.
-  5. Creates missing destination playlists (private by default).
-  6. Removes a track from INBOX only after its destination add succeeds
-     (or if the track was already present in the destination).
-  7. Updates playlist_ids.json only for newly created/adopted playlists.
-  8. Retries transient GET/read timeouts without risking duplicate write retries.
+Reads a recommendation CSV (produced elsewhere, e.g. an AI pass over the
+inbox) and moves confident MOVE rows out of INBOX into their recommended
+destination sub-playlist.
 
-The script uses the current Spotify Web API playlist /items endpoints (2026),
-while reusing token_from_env() from this repo's spotify_api module.
+Safety model (matches review_apply.py's fail-closed validation):
+  - EVERY row's destination is validated before any Spotify call is made. If
+    any row targets something that isn't an enabled sub in config.json — a
+    master ("M · ..."), INBOX itself, a disabled sub, or a typo — the entire
+    run aborts and nothing is written, not just that one row. This script
+    never creates playlists; add a genuinely new sub with
+    `python manage_playlists.py add-sub "<name>"` first, then re-run.
+  - one-track-one-sub is checked against every live sub before writing: if a
+    track is already filed somewhere else, it is left in INBOX and reported,
+    never silently duplicated.
+  - only rows where action == MOVE and confidence_score >= --min-confidence
+    are considered; KEEP_INBOX rows are left untouched.
+  - only tracks still present in the live INBOX are processed.
+  - a track is removed from INBOX only after its destination add succeeds
+    (or if it was already present at the destination).
 
 Recommended first run:
     python apply_inbox_recommendations.py --dry-run
@@ -22,51 +27,26 @@ Recommended first run:
 Apply:
     python apply_inbox_recommendations.py
 
-Stricter confidence cutoff, if desired:
+Stricter confidence cutoff:
     python apply_inbox_recommendations.py --min-confidence 0.80
-
-Do not create missing destination playlists:
-    python apply_inbox_recommendations.py --no-create-missing
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
-import json
 import logging
 import os
 import sys
-import time
-import urllib.error
-import urllib.parse
-import urllib.request
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Iterable
 
-from spotify_api import token_from_env
-
-
-API_BASE = "https://api.spotify.com/v1"
+from spotify_api import Spotify
+from sync import load_config
 
 DEFAULT_CSV = "spotify_inbox_placement_recommendations.csv"
-IDS_PATH = "playlist_ids.json"
-INBOX_NAME = "INBOX"
-
-# These are the two additions identified in the recommendation pass.
-NEW_PLAYLIST_DESCRIPTIONS = {
-    "CHILL · Trip Hop & Downtempo":
-        "Trip hop, downtempo and leftfield chill. Created from inbox recommendations.",
-    "JAZZ · Standards, Bebop & Cool":
-        "Jazz standards, bebop and cool jazz. Created from inbox recommendations.",
-}
 
 log = logging.getLogger("apply_inbox_recommendations")
-
-
-class SpotifyApiError(RuntimeError):
-    pass
 
 
 @dataclass(frozen=True)
@@ -75,143 +55,26 @@ class Recommendation:
     track: str
     uri: str
     destination: str
-    action: str
     confidence: float
-    confidence_label: str
 
     @property
     def label(self) -> str:
         return f"{self.artist} — {self.track}"
 
 
-def chunks(values: list[str], size: int = 100) -> Iterable[list[str]]:
-    for i in range(0, len(values), size):
-        yield values[i:i + size]
-
-
-def load_json(path: str, default):
-    if not os.path.exists(path):
-        return default
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def save_json_atomic(path: str, data) -> None:
-    tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-        f.write("\n")
-    os.replace(tmp, path)
-
-
-def api_request(
-    token: str,
-    method: str,
-    path: str,
-    *,
-    body=None,
-    params: dict | None = None,
-    retries: int = 5,
-    timeout: float = 60.0,
-):
-    if path.startswith("http://") or path.startswith("https://"):
-        url = path
-    else:
-        url = API_BASE + path
-
-    if params:
-        query = urllib.parse.urlencode(params, doseq=True)
-        url += ("&" if "?" in url else "?") + query
-
-    data = None
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/json",
-    }
-    if body is not None:
-        data = json.dumps(body).encode("utf-8")
-        headers["Content-Type"] = "application/json"
-
-    for attempt in range(retries + 1):
-        req = urllib.request.Request(url, data=data, headers=headers, method=method)
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
-                raw = resp.read()
-                if not raw:
-                    return None
-                return json.loads(raw.decode("utf-8"))
-        except urllib.error.HTTPError as exc:
-            raw = exc.read().decode("utf-8", errors="replace")
-
-            if exc.code == 429 and attempt < retries:
-                retry_after = exc.headers.get("Retry-After", "2")
-                try:
-                    delay = max(1.0, float(retry_after))
-                except ValueError:
-                    delay = 2.0
-                log.warning("Spotify rate limit; retrying in %.1fs", delay)
-                time.sleep(delay)
-                continue
-
-            if exc.code >= 500 and attempt < retries:
-                delay = min(2 ** attempt, 10)
-                log.warning("Spotify %s; retrying in %ss", exc.code, delay)
-                time.sleep(delay)
-                continue
-
-            raise SpotifyApiError(
-                f"{method} {url} failed with HTTP {exc.code}: {raw}"
-            ) from exc
-        except TimeoutError as exc:
-            # Python 3.14 can raise TimeoutError directly from resp.read(),
-            # rather than wrapping it in urllib.error.URLError.
-            #
-            # Retrying reads is safe. For writes, an HTTP request may have
-            # reached Spotify even if our response read timed out, so do not
-            # blindly retry and risk adding duplicate playlist items. The
-            # caller will leave the track in INBOX; the next script run will
-            # detect whether it is already present at the destination.
-            if method.upper() in {"GET", "HEAD"} and attempt < retries:
-                delay = min(2 ** attempt, 10)
-                log.warning(
-                    "Spotify read timed out; retrying in %ss (%d/%d)",
-                    delay, attempt + 1, retries,
-                )
-                time.sleep(delay)
-                continue
-            raise SpotifyApiError(
-                f"{method} {url} timed out after {timeout:.0f}s"
-            ) from exc
-
-        except urllib.error.URLError as exc:
-            if attempt < retries:
-                delay = min(2 ** attempt, 10)
-                log.warning("Network error; retrying in %ss: %s", delay, exc)
-                time.sleep(delay)
-                continue
-            raise SpotifyApiError(f"{method} {url} failed: {exc}") from exc
-
-    raise SpotifyApiError(f"{method} {url} failed after retries")
-
-
-def read_recommendations(path: str, min_confidence: float):
+def read_recommendations(path: str, min_confidence: float) -> tuple[list[Recommendation], int, int, int]:
     if not os.path.exists(path):
         raise SystemExit(f"Recommendation CSV not found: {path}")
 
     moves: list[Recommendation] = []
-    keep_inbox = 0
-    below_threshold = 0
-    invalid = 0
+    keep_inbox = below_threshold = invalid = 0
 
     with open(path, encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         required = {"track_uri", "recommended_playlist", "action", "confidence_score"}
         missing = required - set(reader.fieldnames or [])
         if missing:
-            raise SystemExit(
-                "Recommendation CSV is missing required columns: "
-                + ", ".join(sorted(missing))
-            )
+            raise SystemExit(f"Recommendation CSV is missing column(s): {', '.join(sorted(missing))}")
 
         for row in reader:
             action = (row.get("action") or "").strip().upper()
@@ -226,32 +89,25 @@ def read_recommendations(path: str, min_confidence: float):
             if action != "MOVE":
                 keep_inbox += 1
                 continue
-
             if confidence < min_confidence:
                 below_threshold += 1
                 continue
-
-            if not uri.startswith("spotify:track:") or not destination or destination == INBOX_NAME:
+            if not uri.startswith("spotify:track:") or not destination:
                 invalid += 1
                 continue
 
-            moves.append(
-                Recommendation(
-                    artist=(row.get("artist") or "").strip(),
-                    track=(row.get("track") or "").strip(),
-                    uri=uri,
-                    destination=destination,
-                    action=action,
-                    confidence=confidence,
-                    confidence_label=(row.get("confidence_label") or "").strip(),
-                )
-            )
+            moves.append(Recommendation(
+                artist=(row.get("artist") or "").strip(),
+                track=(row.get("track") or "").strip(),
+                uri=uri,
+                destination=destination,
+                confidence=confidence,
+            ))
 
-    # One URI should never be sent to multiple destination playlists.
+    # One URI should never be recommended to two different destinations.
     seen: dict[str, str] = {}
     conflicts: list[tuple[str, str, str]] = []
     unique_moves: list[Recommendation] = []
-
     for rec in moves:
         previous = seen.get(rec.uri)
         if previous is None:
@@ -269,348 +125,149 @@ def read_recommendations(path: str, min_confidence: float):
     return unique_moves, keep_inbox, below_threshold, invalid
 
 
-def my_playlists(token: str) -> dict[str, list[str]]:
-    """Return exact playlist name -> list of owned/collaborative playlist IDs."""
-    by_name: dict[str, list[str]] = defaultdict(list)
-    offset = 0
-    limit = 50
+def validate_destinations(recs: list[Recommendation], config: dict, sub_ids: dict[str, str]) -> None:
+    """Abort the entire run — before any Spotify call is made — if any row
+    targets something that isn't an enabled sub.
 
-    while True:
-        payload = api_request(
-            token, "GET", "/me/playlists",
-            params={"limit": limit, "offset": offset},
-        )
-        items = (payload or {}).get("items") or []
+    This matches review_apply.py's fail-closed validation: everything happens
+    up front and completely, so a bad row can never let some tracks get
+    written while others silently don't. In particular this is the guard
+    against a recommendation CSV naming a master ("M · ...") or INBOX itself
+    as a destination — those are never valid and must stop the run, not just
+    get skipped while everything else goes through.
+    """
+    master_names = {m["name"] for m in config["masters"]}
+    inbox_name = config["inbox"]["name"]
 
-        for playlist in items:
-            name = playlist.get("name")
-            pid = playlist.get("id")
-            if name and pid:
-                by_name[name].append(pid)
+    bad: dict[str, str] = {}  # destination -> reason
+    for rec in recs:
+        if rec.destination in sub_ids:
+            continue
+        if rec.destination in bad:
+            continue
+        if rec.destination in master_names:
+            bad[rec.destination] = "this is a MASTER — masters are write-only by sync.py, never a valid destination"
+        elif rec.destination == inbox_name:
+            bad[rec.destination] = "this is INBOX itself"
+        elif any(s["name"] == rec.destination for s in config["subs"]):
+            bad[rec.destination] = "this sub exists but is disabled in config.json"
+        else:
+            bad[rec.destination] = "not a known sub — typo, or a new sub not yet added"
 
-        if len(items) < limit:
-            break
-        offset += len(items)
-
-    return dict(by_name)
-
-
-def resolve_existing_playlist(
-    name: str,
-    *,
-    by_name: dict[str, list[str]],
-    tracked_ids: dict[str, str],
-) -> str | None:
-    ids = by_name.get(name, [])
-
-    if not ids:
-        return tracked_ids.get(name)
-
-    if len(ids) == 1:
-        return ids[0]
-
-    tracked = tracked_ids.get(name)
-    if tracked and tracked in ids:
-        return tracked
-
-    raise SpotifyApiError(
-        f"Multiple playlists are named {name!r} and playlist_ids.json does not "
-        "disambiguate them. Rename one or record the intended ID before running."
-    )
+    if bad:
+        log.error("%d recommended destination(s) are not valid. Nothing was written.", len(bad))
+        for name, reason in sorted(bad.items()):
+            count = sum(1 for r in recs if r.destination == name)
+            log.error("  %r (%d track(s)): %s", name, count, reason)
+        log.error("Fix the CSV, or run `python manage_playlists.py add-sub` for a genuinely new sub, then re-run.")
+        raise SystemExit(1)
 
 
-def get_playlist_uris(token: str, playlist_id: str) -> list[str]:
-    uris: list[str] = []
-    offset = 0
-    limit = 100
-
-    while True:
-        payload = api_request(
-            token, "GET", f"/playlists/{playlist_id}/items",
-            params={"limit": limit, "offset": offset},
-        )
-        items = (payload or {}).get("items") or []
-
-        for entry in items:
-            # Current API uses "item"; "track" is kept as a compatibility fallback.
-            obj = entry.get("item") or entry.get("track") or {}
-            uri = obj.get("uri")
-            if isinstance(uri, str) and uri.startswith("spotify:track:"):
-                uris.append(uri)
-
-        if len(items) < limit:
-            break
-        offset += len(items)
-
-    return uris
-
-
-def create_playlist(
-    token: str,
-    name: str,
-    description: str,
-    *,
-    public: bool,
-) -> str:
-    payload = api_request(
-        token,
-        "POST",
-        "/me/playlists",
-        body={
-            "name": name,
-            "public": public,
-            "description": description[:300],
-        },
-    )
-    pid = (payload or {}).get("id")
-    if not pid:
-        raise SpotifyApiError(f"Spotify did not return an ID for new playlist {name!r}")
-    return pid
-
-
-def add_items(token: str, playlist_id: str, uris: list[str]) -> None:
-    for batch in chunks(uris, 100):
-        api_request(
-            token,
-            "POST",
-            f"/playlists/{playlist_id}/items",
-            body={"uris": batch},
-        )
-
-
-def remove_items(token: str, playlist_id: str, uris: list[str]) -> None:
-    for batch in chunks(uris, 100):
-        api_request(
-            token,
-            "DELETE",
-            f"/playlists/{playlist_id}/items",
-            body={"items": [{"uri": uri} for uri in batch]},
-        )
-
-
-def ensure_destination(
-    token: str,
-    name: str,
-    *,
-    by_name: dict[str, list[str]],
-    tracked_ids: dict[str, str],
-    create_missing: bool,
-    public_new: bool,
-    dry_run: bool,
-) -> tuple[str | None, bool]:
-    pid = resolve_existing_playlist(name, by_name=by_name, tracked_ids=tracked_ids)
-    if pid:
-        return pid, False
-
-    if not create_missing:
-        return None, False
-
-    desc = NEW_PLAYLIST_DESCRIPTIONS.get(
-        name,
-        "Created from Spotify inbox placement recommendations.",
-    )
-
-    if dry_run:
-        log.info("  [dry-run] would create missing playlist %r", name)
-        return None, True
-
-    pid = create_playlist(token, name, desc, public=public_new)
-    tracked_ids[name] = pid
-    by_name.setdefault(name, []).append(pid)
-    log.info("  Created %r -> %s", name, pid)
-    return pid, True
+def check_one_track_one_sub(sp: Spotify, config: dict) -> dict[str, str]:
+    """uri -> sub name, across every enabled sub, read live right now."""
+    existing: dict[str, str] = {}
+    for sub in config["subs"]:
+        if not sub.get("enabled", True):
+            continue
+        for uri in sp.playlist_track_uris(sub["id"]):
+            existing[uri] = sub["name"]
+    return existing
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(
-        description="Move confident recommendation rows out of Spotify INBOX."
-    )
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--csv", default=DEFAULT_CSV, help="recommendation CSV path")
     ap.add_argument("--dry-run", action="store_true", help="show changes; write nothing")
-    ap.add_argument(
-        "--min-confidence",
-        type=float,
-        default=0.65,
-        help="minimum confidence_score for MOVE rows (default: 0.65)",
-    )
-    ap.add_argument(
-        "--no-create-missing",
-        action="store_true",
-        help="do not create destination playlists that are missing",
-    )
-    ap.add_argument(
-        "--public-new",
-        action="store_true",
-        help="create missing destination playlists as public (default: private)",
-    )
-    ap.add_argument(
-        "--keep-inbox-copy",
-        action="store_true",
-        help="add to destinations but do not remove successfully placed tracks from INBOX",
-    )
+    ap.add_argument("--min-confidence", type=float, default=0.65,
+                     help="minimum confidence_score for MOVE rows (default: 0.65)")
+    ap.add_argument("--keep-inbox-copy", action="store_true",
+                     help="add to destinations but do not remove placed tracks from INBOX")
     args = ap.parse_args()
 
     if not 0 <= args.min_confidence <= 1:
         ap.error("--min-confidence must be between 0 and 1")
 
-    recs, manual_count, below_threshold, invalid = read_recommendations(
-        args.csv, args.min_confidence
-    )
+    config = load_config()
+    inbox = config.get("inbox")
+    if not inbox:
+        log.error("No inbox configured in config.json.")
+        return 2
+    sub_ids = {s["name"]: s["id"] for s in config["subs"] if s.get("enabled", True)}
+
+    recs, keep_inbox, below_threshold, invalid = read_recommendations(args.csv, args.min_confidence)
+    validate_destinations(recs, config, sub_ids)  # raises SystemExit before any Spotify call if a row is bad
 
     log.info(
-        "CSV: %d MOVE candidate(s); %d KEEP_INBOX; %d below threshold; %d invalid.",
-        len(recs), manual_count, below_threshold, invalid,
+        "CSV: %d usable MOVE candidate(s); %d KEEP_INBOX; %d below threshold; %d invalid.",
+        len(recs), keep_inbox, below_threshold, invalid,
     )
 
-    token = token_from_env()
-    playlists = my_playlists(token)
-    tracked_ids: dict[str, str] = load_json(IDS_PATH, {})
+    sp = Spotify.from_env(dry_run=args.dry_run)
+    log.info("Authenticated as: %s", sp.me().get("display_name"))
 
-    inbox_id = resolve_existing_playlist(
-        INBOX_NAME, by_name=playlists, tracked_ids=tracked_ids
-    )
-    if not inbox_id:
-        log.error("Could not find playlist named %r.", INBOX_NAME)
-        return 2
+    inbox_uris = set(sp.playlist_track_uris(inbox["id"]))
+    log.info("Live INBOX: %d unique track(s).", len(inbox_uris))
 
-    inbox_uris = get_playlist_uris(token, inbox_id)
-    inbox_set = set(inbox_uris)
-    log.info("Live INBOX contains %d track occurrence(s), %d unique.", len(inbox_uris), len(inbox_set))
+    live_recs = [r for r in recs if r.uri in inbox_uris]
+    stale = len(recs) - len(live_recs)
+    if stale:
+        log.info("Skipping %d recommended track(s) no longer present in live INBOX.", stale)
 
-    # Only act on recommendations whose tracks are still in the live inbox.
-    live_recs = [r for r in recs if r.uri in inbox_set]
-    stale_recs = [r for r in recs if r.uri not in inbox_set]
+    log.info("Checking one-track-one-sub against live subs before writing...")
+    existing = check_one_track_one_sub(sp, config)
 
-    if stale_recs:
-        log.info(
-            "Skipping %d recommended MOVE track(s) no longer present in live INBOX.",
-            len(stale_recs),
-        )
+    conflicts = [(r, existing[r.uri]) for r in live_recs
+                 if r.uri in existing and existing[r.uri] != r.destination]
+    conflict_uris = {r.uri for r, _ in conflicts}
+    actionable = [r for r in live_recs if r.uri not in conflict_uris]
+
+    if conflicts:
+        log.warning("%d track(s) already filed elsewhere — left in INBOX, not moved:", len(conflicts))
+        for rec, current_sub in conflicts[:20]:
+            log.warning("  %s is already in %r, recommendation said %r", rec.label, current_sub, rec.destination)
+        if len(conflicts) > 20:
+            log.warning("  ... and %d more", len(conflicts) - 20)
 
     grouped: dict[str, list[Recommendation]] = defaultdict(list)
-    for rec in live_recs:
+    for rec in actionable:
         grouped[rec.destination].append(rec)
 
     safe_to_remove: set[str] = set()
-    failed: list[tuple[str, str]] = []
-    created_names: list[str] = []
-
     for destination in sorted(grouped):
-        rows = grouped[destination]
-        uris = list(dict.fromkeys(r.uri for r in rows))
+        uris = list(dict.fromkeys(r.uri for r in grouped[destination]))
+        dest_id = sub_ids[destination]
 
-        log.info("%s: %d inbox track(s)", destination, len(uris))
+        current = set(sp.playlist_track_uris(dest_id))
+        missing = [u for u in uris if u not in current]
+        already_there = [u for u in uris if u in current]
 
-        try:
-            pid, created = ensure_destination(
-                token,
-                destination,
-                by_name=playlists,
-                tracked_ids=tracked_ids,
-                create_missing=not args.no_create_missing,
-                public_new=args.public_new,
-                dry_run=args.dry_run,
-            )
-        except SpotifyApiError as exc:
-            log.error("  Destination resolution failed: %s", exc)
-            failed.extend((r.uri, str(exc)) for r in rows)
-            continue
-
-        if created:
-            created_names.append(destination)
-            # Persist a newly created ID immediately so an interrupted run cannot
-            # create a duplicate playlist on the next run.
-            if not args.dry_run:
-                save_json_atomic(IDS_PATH, tracked_ids)
-
-        if pid is None:
-            if args.dry_run and created:
-                existing_set: set[str] = set()
-            else:
-                msg = "destination does not exist and creation is disabled"
-                log.warning("  %s", msg)
-                failed.extend((r.uri, msg) for r in rows)
-                continue
-        else:
-            try:
-                existing_set = set(get_playlist_uris(token, pid))
-            except SpotifyApiError as exc:
-                log.error("  Could not read destination: %s", exc)
-                failed.extend((r.uri, str(exc)) for r in rows)
-                continue
-
-        missing = [uri for uri in uris if uri not in existing_set]
-        already_there = [uri for uri in uris if uri in existing_set]
-
-        if already_there:
-            log.info("  %d already present", len(already_there))
-
+        log.info("%-42s +%d new, %d already there", destination, len(missing), len(already_there))
         if missing:
-            if args.dry_run:
-                log.info("  [dry-run] would add %d", len(missing))
-                safe_to_remove.update(missing)
-            else:
-                try:
-                    add_items(token, pid, missing)
-                    log.info("  added %d", len(missing))
-                    safe_to_remove.update(missing)
-                except SpotifyApiError as exc:
-                    # If an add fails, leave those tracks in INBOX.
-                    log.error("  add failed; leaving %d track(s) in INBOX: %s", len(missing), exc)
-                    failed.extend((uri, str(exc)) for uri in missing)
-
-        # If already in destination, it is also safe to clear from inbox.
+            sp.add_tracks(dest_id, missing)
+        safe_to_remove.update(missing)
         safe_to_remove.update(already_there)
 
-    # Intersect again with live inbox for clarity/idempotency.
-    safe_to_remove &= inbox_set
-
     if args.keep_inbox_copy:
-        log.info(
-            "--keep-inbox-copy: %d successfully placed track(s) will remain in INBOX.",
-            len(safe_to_remove),
-        )
+        log.info("--keep-inbox-copy: %d track(s) will remain in INBOX despite being filed.", len(safe_to_remove))
     elif safe_to_remove:
-        if args.dry_run:
-            log.info("[dry-run] would remove %d successfully placed track(s) from INBOX.", len(safe_to_remove))
-        else:
-            try:
-                remove_items(token, inbox_id, sorted(safe_to_remove))
-                log.info("Removed %d successfully placed track(s) from INBOX.", len(safe_to_remove))
-            except SpotifyApiError as exc:
-                # Destination adds have already happened, but leaving inbox copies is safe.
-                log.error(
-                    "Could not remove placed tracks from INBOX. Nothing was lost; "
-                    "destination adds remain and INBOX copies remain: %s",
-                    exc,
-                )
-                return 3
-
-    if not args.dry_run and created_names:
-        log.info(
-            "Recorded %d newly created playlist ID(s) in %s.",
-            len(created_names), IDS_PATH,
-        )
+        sp.remove_tracks(inbox["id"], sorted(safe_to_remove))
+        log.info("Removed %d track(s) from INBOX.", len(safe_to_remove))
 
     log.info("")
     log.info("Summary")
-    log.info("  MOVE rows eligible by confidence : %d", len(recs))
-    log.info("  Still present in live INBOX      : %d", len(live_recs))
-    log.info("  Successfully placed / safe       : %d", len(safe_to_remove))
-    log.info("  KEEP_INBOX rows untouched         : %d", manual_count)
-    log.info("  Failed placements kept in INBOX   : %d", len({u for u, _ in failed}))
-    log.info("  Missing playlists created/planned : %d", len(created_names))
+    log.info("  Usable MOVE rows                  : %d", len(recs))
+    log.info("  Still present in live INBOX       : %d", len(live_recs))
+    log.info("  Skipped (already filed elsewhere) : %d", len(conflicts))
+    log.info("  Placed / safe to clear            : %d", len(safe_to_remove))
+    log.info("  KEEP_INBOX rows untouched         : %d", keep_inbox)
+    if args.dry_run:
+        log.info("")
+        log.info("DRY RUN — no Spotify writes were made.")
+    log.info("Run python sync.py afterwards to update the masters.")
 
-    if failed:
-        log.warning("Some placements failed. Their tracks were deliberately left in INBOX.")
-        return 1
-
-    return 0
+    return 1 if conflicts else 0
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     sys.exit(main())

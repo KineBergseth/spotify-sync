@@ -121,14 +121,29 @@ def validate(config: dict, ids: dict) -> list[str]:
             )
 
     # config.json vs playlist_ids.json
-    for name, entry_id in [(s["name"], s["id"]) for s in config["subs"]] + \
-                          [(m["name"], m["id"]) for m in config["masters"]] + \
-                          [(config["inbox"]["name"], config["inbox"]["id"])]:
+    known = [(s["name"], s["id"]) for s in config["subs"]] + \
+            [(m["name"], m["id"]) for m in config["masters"]] + \
+            [(config["inbox"]["name"], config["inbox"]["id"])]
+    known_names = {name for name, _ in known}
+    for name, entry_id in known:
         if name not in ids:
             problems.append(f"{name!r} is in config.json but missing from playlist_ids.json")
         elif ids[name] != entry_id:
             problems.append(
                 f"{name!r} has id {entry_id!r} in config.json but {ids[name]!r} in playlist_ids.json"
+            )
+
+    # The reverse direction matters just as much: a playlist_ids.json entry with
+    # no config.json counterpart is invisible to sync.py, export.py, and
+    # apply_inbox_recommendations.py — it feeds no master, is never checked for
+    # one-track-one-sub, and never shows up in review. This is exactly how a
+    # sub can go "missing" after being created by a script that writes
+    # playlist_ids.json directly instead of going through add-sub.
+    for name in ids:
+        if name not in known_names:
+            problems.append(
+                f"{name!r} is in playlist_ids.json but not in config.json at all "
+                "(orphaned playlist — add it with add-sub, or confirm it's abandoned)"
             )
 
     return problems

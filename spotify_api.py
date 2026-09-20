@@ -58,8 +58,8 @@ def token_from_env() -> str:
 class Spotify:
     """Thin API client with retry-aware request handling.
 
-    Access tokens last about an hour. Long runs (a big bootstrap, or suggest.py
-    fetching genres artist-by-artist across a large inbox) can outlive that, so
+    Access tokens last about an hour. Long runs (a big bootstrap, or a large
+    export.py/review pass across many playlists) can outlive that, so
     the client re-authenticates itself on a 401 if it was built with
     Spotify.from_env() and has credentials on hand to do so.
     """
